@@ -11,6 +11,7 @@
 services:
   api:
     image: ghcr.io/lesterholy/honcho:latest
+    container_name: honcho-api
     ports:
       - ${HOST_PORT}:8000
     # -- Development: mount source for live reload --
@@ -34,6 +35,7 @@ services:
 
   deriver:
     image: ghcr.io/lesterholy/honcho:latest
+    container_name: honcho-deriver
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - PRIVATE_HOST=${PRIVATE_HOST}
