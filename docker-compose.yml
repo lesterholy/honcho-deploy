@@ -10,7 +10,7 @@
 
 services:
   api:
-    image: :ghcr.io/lesterholy/honcho:latest
+    image: ghcr.io/lesterholy/honcho:latest
     ports:
       - "127.0.0.1:18000:8000"
     # -- Development: mount source for live reload --
@@ -33,7 +33,7 @@ services:
       - dokploy
 
   deriver:
-    image: :ghcr.io/lesterholy/honcho:latest
+    image: ghcr.io/lesterholy/honcho:latest
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - PRIVATE_HOST=${PRIVATE_HOST}
