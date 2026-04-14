@@ -12,12 +12,9 @@ services:
   api:
     image: ghcr.io/lesterholy/honcho:latest
     container_name: honcho-api
+    entrypoint: ["sh", "/app/docker/entrypoint.sh"]
     ports:
       - ${HOST_PORT}:8000
-    # -- Development: mount source for live reload --
-    # volumes:
-    #   - .:/app
-    #   - venv:/app/.venv
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - PRIVATE_HOST=${PRIVATE_HOST}
@@ -36,6 +33,7 @@ services:
   deriver:
     image: ghcr.io/lesterholy/honcho:latest
     container_name: honcho-deriver
+    entrypoint: ["/app/.venv/bin/python", "-m", "src.deriver"]
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - PRIVATE_HOST=${PRIVATE_HOST}
@@ -54,4 +52,3 @@ services:
 networks:
   dokploy:
     external: true
-    name: dokploy-network
