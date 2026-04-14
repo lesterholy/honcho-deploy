@@ -1,0 +1,53 @@
+# Honcho Docker Compose
+#
+# Usage:
+#   cp docker-compose.yml.example docker-compose.yml
+#   cp .env.template .env  # edit with your provider config
+#   docker compose up -d --build
+#
+# By default, ports are bound to 127.0.0.1 (localhost only).
+# For development, uncomment the source mounts and monitoring services below.
+
+services:
+  database:
+    image: pgvector/pgvector:pg15
+    restart: unless-stopped
+    ports:
+      - ${PRIVATE_HOST}:15432:5432
+      - 127.0.0.1:15432:5432
+    command: ["postgres", "-c", "max_connections=200"]
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - PRIVATE_HOST=${PRIVATE_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8.2
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:16379:6379
+      - ${PRIVATE_HOST}:16379:6379
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+  redis-data:
+  # -- Development: uncomment if using source mounts --
+  # venv:
+  # prometheus-data:

@@ -1,0 +1,55 @@
+# Honcho Docker Compose
+#
+# Usage:
+#   cp docker-compose.yml.example docker-compose.yml
+#   cp .env.template .env  # edit with your provider config
+#   docker compose up -d --build
+#
+# By default, ports are bound to 127.0.0.1 (localhost only).
+# For development, uncomment the source mounts and monitoring services below.
+
+services:
+  api:
+    image: :ghcr.io/lesterholy/honcho:latest
+    ports:
+      - "127.0.0.1:18000:8000"
+    # -- Development: mount source for live reload --
+    # volumes:
+    #   - .:/app
+    #   - venv:/app/.venv
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - PRIVATE_HOST=${PRIVATE_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_CONNECTION_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${PRIVATE_HOST}:15432/${POSTGRES_DB}
+      - CACHE_URL=redis://${PRIVATE_HOST}:16379/0?suppress=true
+      - CACHE_ENABLED=true
+    env_file:
+      - path: .env
+        required: false
+    restart: unless-stopped
+    networks:
+      - dokploy
+
+  deriver:
+    image: :ghcr.io/lesterholy/honcho:latest
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - PRIVATE_HOST=${PRIVATE_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_CONNECTION_URI=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${PRIVATE_HOST}:15432/${POSTGRES_DB}
+      - CACHE_URL=redis://${PRIVATE_HOST}:16379/0?suppress=true
+      - CACHE_ENABLED=true
+    env_file:
+      - path: .env
+        required: false
+    restart: unless-stopped
+    networks:
+      - dokploy
+
+networks:
+  dokploy:
+    external: true
+    name: dokploy-network
