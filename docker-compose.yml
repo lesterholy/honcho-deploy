@@ -27,8 +27,6 @@ services:
       - path: .env
         required: false
     restart: unless-stopped
-    networks:
-      - dokploy
 
   deriver:
     image: ghcr.io/lesterholy/honcho:latest
@@ -46,10 +44,11 @@ services:
       - path: .env
         required: false
     restart: unless-stopped
-    networks:
-      - dokploy
 
 networks:
-  dokploy:
+  default:
     external: true
     name: dokploy-network
+  traefik:
+    external: true
+    name: traefik-network
