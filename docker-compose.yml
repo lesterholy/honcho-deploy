@@ -12,7 +12,7 @@ services:
   api:
     image: ghcr.io/lesterholy/honcho:latest
     ports:
-      - "127.0.0.1:18000:8000"
+      - ${HOST_PORT}:8000
     # -- Development: mount source for live reload --
     # volumes:
     #   - .:/app
